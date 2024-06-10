@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from environs import Env
 
 
@@ -7,21 +8,18 @@ class TgBot:
     token: str
     admin_ids: list[int]
 
+    @staticmethod
+    def from_env(env: Env):
+        token = env.str('BOT_TOKEN')
+        admin_ids = env.int('ADMIN_IDS')
+
+        return TgBot(token=token, admin_ids=admin_ids)
+
 
 @dataclass
 class Config:
     tg_bot: TgBot
 
-
-env: Env = Env()
-env.read_env()
-
-config = Config(
-    tg_bot=TgBot(
-        token=env('BOT_TOKEN'),
-        admin_ids=env.int(('ADMIN_IDS'))
-    )
-)
 
 def load_config(path: str | None = None) -> Config:
 
@@ -29,8 +27,4 @@ def load_config(path: str | None = None) -> Config:
     env.read_env(path)
 
     return Config(
-        tg_bot=TgBot(
-            token=env('BOT_TOKEN'),
-            admin_ids=env.int('ADMIN_IDS')
-        )
-    )
+        tg_bot=TgBot.from_env(env))
